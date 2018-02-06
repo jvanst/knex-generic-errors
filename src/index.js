@@ -5,7 +5,7 @@ import fs from 'fs'
 import path from 'path'
 
 export { errors as Errors }
-export function attach(Knex, handler) {
+export function attach(Knex, KnexVersion, handler) {
   Knex.Errors = errors
 
   const knex = handler()
@@ -16,11 +16,11 @@ export function attach(Knex, handler) {
 
   const versions = fs.readdirSync(path.join(__dirname, './versions'))
   const [version] = versions.sort().reverse().filter(function(version) {
-    return semver.satisfies(knex.VERSION, `^${ version }`)
+    return semver.satisfies(KnexVersion, `^${ version }`)
   })
 
   if (!version) {
-    throw new Error(`knex@${ knex.VERSION } is not supported`)
+    throw new Error(`knex@${ KnexVersion } is not supported`)
   }
   const clientOverrider = require(`./versions/${ version }/client`)
 
