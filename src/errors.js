@@ -4,7 +4,7 @@ import { assign } from 'lodash'
 
 const BaseError = function BaseError() {  
   var superInstance = Error.apply(this)
-  this.name = superInstance.name = 'BaseError'
+  this.type = superInstance.type = 'BaseError'
 
   if (Error.captureStackTrace)
     Error.captureStackTrace(this, this.constructor)
@@ -30,7 +30,7 @@ BaseError.prototype.toJSON = toJSON
 
 const DatabaseError = function DatabaseError() {
   const superInstance = BaseError.apply(this, arguments)
-  this.name = superInstance.name = 'DatabaseError'
+  this.type = superInstance.type = 'DatabaseError'
   if ((this.constructor === DatabaseError) === false) return superInstance
   else improveStack(this)
 }
@@ -39,7 +39,7 @@ inherits(DatabaseError, BaseError)
 
 const QueryError = function QueryError() {
   const superInstance = DatabaseError.apply(this, arguments)
-  this.name = superInstance.name = 'QueryError'
+  this.type = superInstance.type = 'QueryError'
   if ((this.constructor === QueryError) === false) return superInstance
   else improveStack(this)
 }
@@ -48,7 +48,7 @@ inherits(QueryError, DatabaseError)
 
 const ConnectionError = function ConnectionError() {
   const superInstance = DatabaseError.apply(this, arguments)
-  this.name = superInstance.name = 'ConnectionError'
+  this.type = superInstance.type = 'ConnectionError'
   if ((this.constructor === ConnectionError) === false) return superInstance
   else improveStack(this)
 }
@@ -79,11 +79,11 @@ function getProperties(args) {
   return {}
 }
 
-function dynamicInherit(propName, target, cause) {
-  Object.defineProperty(target, propName, {
+function dynamicInherit(proptype, target, cause) {
+  Object.defineProperty(target, proptype, {
     get: function get() {
       if (cause) {
-        return cause[propName]
+        return cause[proptype]
       }
       return undefined
     }
@@ -108,15 +108,15 @@ function improveStack(obj) {
 
 function toJSON() {
   const json =  {}
-  Object.getOwnPropertyNames(this).forEach(function (name) {
-      json[name] =
-        name === 'stack'
-        ? this[name].split('\n')
-        : name === 'cause'
-          ? ( this[name] && this[name].toJSON
-            ? this[name].toJSON()
-            : this[name] )
-          : this[name]
+  Object.getOwnPropertytypes(this).forEach(function (type) {
+      json[type] =
+        type === 'stack'
+        ? this[type].split('\n')
+        : type === 'cause'
+          ? ( this[type] && this[type].toJSON
+            ? this[type].toJSON()
+            : this[type] )
+          : this[type]
   }, this)
   return json
 }
